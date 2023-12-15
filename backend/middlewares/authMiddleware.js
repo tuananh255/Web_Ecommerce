@@ -1,18 +1,20 @@
 const userModel = require('../models/userModel.js')
 const jwt = require('jsonwebtoken')
+const passport = require('passport');
 const asyncHandle = require('express-async-handler')
+const { genarateToken } = require('../config/jwtToken.js')
 
 const authMiddleware = asyncHandle(async(req,res,next)=>{
-    let token
-    if(req?.headers?.authorization?.startsWith('Bearer')){
+    let token // khởi tạo
+    if(req?.headers?.authorization?.startsWith('Bearer')){ // true
         token = req.headers.authorization.split(" ")[1]
         try {
             if(token){
                 const decoded = jwt.verify(token,process.env.JWT_SECRET)
-                console.log(decoded)
-                const user = await userModel.findById(decoded?._id)
-                req.user = user
-                next()
+                console.log(decoded) //lấy được dữ liệu của token
+                const user = await userModel.findById(decoded?.id) // tạo user bằng với giá trị id vừa đc lấy 
+                req.user = user // tạo mới phương thức user
+                next() // đi tiếp
             }
         } catch (error) {
             res.status(500).send("Not authorization token expired, please login again")
@@ -22,8 +24,14 @@ const authMiddleware = asyncHandle(async(req,res,next)=>{
     }
 })
 
-const isAdmin = asyncHandle(async(req,res,next)=>{
-    // console.log(req.user)
-})
+const isAdmin = asyncHandle(async (req, res, next) => {
+    const {email} = req.user
+    const adminUser = await userModel.findOne({email})
+    if(adminUser.role !=='admin'){ // nếu khác admin thì ko được qua
+        res.send({message:"you are not an admin"})
+    }else{
+        next()
+    }
+});
 
 module.exports = {authMiddleware,isAdmin}
