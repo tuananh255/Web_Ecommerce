@@ -21,25 +21,28 @@ var productSchema = new mongoose.Schema({
         type:Number,
         required:true,
     },
-    category:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref: "Category"
+    category:{ // loại sản phẩm
+        type:String,
+        required : true
     },
-    brand :{
+    brand :{ // hãng nào
         type : String,
-        enum : ['Apple','Samsung','Lenovo']
+        required : true
     },
-    quantity : Number,
+    quantity : {
+        type:Number,
+        required : true
+    },
     sold :{
         type : Number,
-        default : 0
+        default : 0,
     },
     images :{
         type : Array
     },
     color:{
         type : String,
-        enum : ['Black','Brown','Red']
+        required : true
     },
     rating:[{
         start : Number,
