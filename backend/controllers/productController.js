@@ -2,6 +2,7 @@ const ProductModel = require('../models/productModel.js')
 const asyncHandle = require('express-async-handler')
 const slugify = require('slugify')
 const userModel = require('../models/userModel.js')
+const {cloudinaryUploadImg,cloudinaryDeleteImg} = require('../utils/cloudinaly.js')
 
 
 // create new product
@@ -188,30 +189,40 @@ const addToWishlist = asyncHandle(async(req,res)=>{
 
 // danh gai san pham
 const rating = asyncHandle(async (req, res) => {
-    const { _id } = req.user;
-    const { star, prodId, comment } = req.body;
+    // Trích xuất ID Người Dùng và Dữ Liệu Đánh Giá từ Request:
+    const { _id } = req.user; // đăng nhập sẽ có 
+    const { star, prodId, comment } = req.body; // người dùng truyền vào
+    // /////////////////
     try {
-      const product = await ProductModel.findById(prodId);
+      const product = await ProductModel.findById(prodId); // tìm kiếm sản phẩm có id
+      // kiểm tra người dùng đã đánh giá chưa
       let alreadyRated = product?.ratings.find(
-        (userId) => userId.postedby.toString() === _id.toString()
+        // tìm kiếm mảng ratings
+        (userId) => userId.postedby.toString() === _id.toString() // lấy id người dùng 
       );
+      // nếu có tồn tại thì cập nhật lại bài đánh giá của họ
       if (alreadyRated) {
         const updateRating = await ProductModel.updateOne(
           {
-            ratings: { $elemMatch: alreadyRated },
+            ratings: { $elemMatch: alreadyRated }, // $elemMatc (tìm kiếm) : alreadyRated ( mún tìm kiếm )
           },
           {
+            // "ratings.$.star": Đây là cách xác định trường star bên trong mảng ratings của tài liệu MongoDB. 
+            // Dấu $ là một placeholder cho chỉ số của phần tử mà bạn đang cập nhật
             $set: { "ratings.$.star": star, "ratings.$.comment": comment },
           },
           {
             new: true,
           }
         );
-      } else {
+      }
+      // thêm đánh giá nếu người dùng chưa đánh giá 
+      else {
         const rateProduct = await ProductModel.findByIdAndUpdate(
-          prodId,
+          prodId, // lấy id sản phẩm mà người dùng rating
           {
-            $push: {
+            //đẩy vào mảng
+            $push: { // toán tử thêm vào một mảng tài liệu
               ratings: {
                 star: star,
                 comment: comment,
@@ -224,20 +235,23 @@ const rating = asyncHandle(async (req, res) => {
           }
         );
       }
+
+      // tính toán điểm đánh giá tỏng cộng và cập nhật sản phẩm cuối cùng
       const getallratings = await ProductModel.findById(prodId);
-      let totalRating = getallratings.ratings.length;
-      let ratingsum = getallratings.ratings
-        .map((item) => item.star)
-        .reduce((prev, curr) => prev + curr, 0);
+      let totalRating = getallratings.ratings.length; // tổng số đánh giá
+      let ratingsum = getallratings.ratings 
+        .map((item) => item.star) // lạp qua các item.start
+        // pre là value tích lũy , 0 là value khởi tạo mà pre chạy ban đầu
+        .reduce((prev, curr) => prev + curr, 0); // prev + curr thêm value của phần tử hiện tại vào giá trị tích lũy
       let actualRating = Math.round(ratingsum / totalRating); //  tinh duoc ti le cua sao de  hien thi  sao
       let finalproduct = await ProductModel.findByIdAndUpdate(
-        prodId,
+        prodId, // id mà người dùng truyền 
         {
-          totalrating: actualRating,
+          totalrating: actualRating, // update lại tổng sao 
         },
         { new: true }
       );
-      res.json(finalproduct);
+      res.json(finalproduct); 
     } catch (error) {
         console.log(error)
         res.status(500).send({
@@ -247,6 +261,63 @@ const rating = asyncHandle(async (req, res) => {
     }
   });
 
+  // tạo cloudinaly(utils) và uploadimg(middleware) trước
+const uploadImages =asyncHandle(async(req,res)=>{
+  // console.log(req.files)
+  // const {id} = req.params
+  try {
+    const uploader = (path)=>cloudinaryUploadImg(path,'images')
+    const urls =[]
+    const files = req.files
+    for(const file of files){
+      const {path}= file
+      const newPath = await uploader(path)
+      urls.push(newPath)
+    }
 
-module.exports = {createProduct ,getaProduct,getAllProduct,updateProduct,deleteProduct,addToWishlist,rating}
+    const images = urls.map(file=>
+    {
+      return file
+    },)
+    res.json(images)
+
+
+    // const findProduct  = await ProductModel.findByIdAndUpdate(id,{
+    //   images:urls.map(file=>
+    //   {
+    //     return file
+    //   },)
+    // },{
+    //   new:true
+    // })
+    // res.json(findProduct)
+  } catch (error) {
+    console.log(error)
+        res.status(500).send({
+            success : false,
+            message : "upload product images error !"
+        })
+  }
+})
+
+const deleteImages =asyncHandle(async(req,res)=>{
+  const {id}=req.params
+  try {
+    const deleteImg =cloudinaryDeleteImg(id,'images')
+    res.json({message:"deleted"})
+    
+
+
+  } catch (error) {
+    console.log(error)
+        res.status(500).send({
+            success : false,
+            message : "upload product images error !"
+        })
+  }
+})
+
+module.exports = {createProduct ,getaProduct,getAllProduct
+  ,updateProduct,deleteProduct,addToWishlist,rating,
+  uploadImages,deleteImages}
 

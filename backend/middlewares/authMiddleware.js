@@ -4,13 +4,15 @@ const passport = require('passport');
 const asyncHandle = require('express-async-handler')
 const { genarateToken } = require('../config/jwtToken.js')
 
+
+// tạo user
 const authMiddleware = asyncHandle(async(req,res,next)=>{
     let token // khởi tạo
     if(req?.headers?.authorization?.startsWith('Bearer')){ // true
         token = req.headers.authorization.split(" ")[1]
         try {
             if(token){
-                const decoded = jwt.verify(token,process.env.JWT_SECRET)
+                const decoded = jwt.verify(token,"SECRET") // truyền vào biến môi trường .env
                 console.log(decoded) //lấy được dữ liệu của token
                 const user = await userModel.findById(decoded?.id) // tạo user bằng với giá trị id vừa đc lấy 
                 req.user = user // tạo mới phương thức user
