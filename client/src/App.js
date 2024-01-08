@@ -18,23 +18,29 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
 import ShippingPolicy from './pages/ShippingPolicy';
 import TermAndconditions from './pages/TermAndconditions';
+import SingleProduct from './pages/SingleProduct';
+import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
 function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path='/' element={<Layout/>}>
+          <Route path='/' element={<Layout/> }>
             {/* được gọi là outlet */}
             <Route index element={<Home/>}/>
             <Route path='about' element={<About/>} />
             <Route path='contact' element={<Contact/>} />
-            <Route path='store' element={<OutStore/>} />
+            <Route path='product' element={<OutStore/>} />
+            <Route path='product/:id' element={<SingleProduct/>} />
             <Route path='blogs' element={<Blogs/>} />
             <Route path='blog/:id' element={<SingleBlog/>} />
+            <Route path='cart' element={<Cart/>} />
             <Route path='compare-product' element={<CompareProduct/>} />
             <Route path='wishlist' element={<Wishlist/>} />
             <Route path='login' element={<Login/>} />
             <Route path='signup' element={<Signup/>} />
+            <Route path='checkout' element={<Checkout/>} />
             <Route path='forgot-password' element={<ForgotPassWord/>} />
             <Route path='reset-password' element={<Resetpassword/>} />
             <Route path='privacy-policy' element={<PrivacyPolicy/>} />

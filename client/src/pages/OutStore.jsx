@@ -7,9 +7,6 @@ import Meta from '../components/Meta';
 import ProductCard from '../components/ProductCard';
 const OutStore = () => {
     const [grid,setGrid] = useState(4)
-    // const gridSetter = (i)=>{
-
-    // }
     return (
         <>
             <Meta title="Our Store"/>
