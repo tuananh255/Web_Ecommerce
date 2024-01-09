@@ -3,7 +3,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined
 } from '@ant-design/icons';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { SiBrandfolder,SiBloglovin } from "react-icons/si";
 import { FiArrowLeftCircle,FiArrowRightCircle  } from "react-icons/fi";
 import { AiOutlineDashboard } from "react-icons/ai";
@@ -64,7 +64,7 @@ const MainLayout = () => {
                   label: 'All Product',
                 },
                 {
-                  key: 'product-list',
+                  key: 'list-product',
                   icon: <CiShoppingCart  className='fs-4'/>,
                   label: 'Product List',
                 },
@@ -163,15 +163,35 @@ const MainLayout = () => {
               <IoIosNotifications className='fs-4'/>
               <span className='badge bg-warning rounded-circle p-1 position-absolute'>3</span>
             </div>
-            <div className="d-flex gap-3 align-items-center">
+            <div className="d-flex gap-3 align-items-center dropdown">
               <div className="">
                 <img 
                   style={{width:"45px", height:"45px",objectFit:"cover",borderRadius:"50%"}} 
                   src="https://img2.thuthuatphanmem.vn/uploads/2018/12/09/hinh-anh-hacker-anonymous_111114617.jpg" 
                   alt="" />
               </div>
-              <div>
+              <div
+                type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                >
                 <h5 className='mb-0'>AnhTuan</h5>
+              </div>
+              <div className="dropdown-menu">
+                <li>
+                  <Link 
+                    to="/" 
+                    className='dropdown-item py-1 mb-1' 
+                    style={{height:"auto",lineHeight:"20px"}}>
+                      View Profile
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    to="/" 
+                    className='dropdown-item py-1 mb-1' 
+                    style={{height:"auto",lineHeight:"20px"}}>
+                      Sign out
+                    </Link>
+                </li>
               </div>
             </div>
           </div>

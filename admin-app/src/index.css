@@ -38,7 +38,12 @@ body {
   padding-top: 10px;
 }
 main{
+  height: 85vh;  
   overflow-y: scroll;
+  background-color: transparent !important;
+}
+main::-webkit-scrollbar{
+  width: 0px;
 }
 .ant-menu-title-content
 {
